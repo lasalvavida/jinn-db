@@ -306,10 +306,6 @@ describe('Database', function() {
             done();
           });
       });
-
-      it('$size', function(done) {
-        
-      });
     });
   });
 
