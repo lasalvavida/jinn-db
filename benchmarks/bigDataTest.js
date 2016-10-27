@@ -16,10 +16,13 @@ db.load()
     }
     var total = 0;
     console.time('Total Insert Time');
+    console.time('Insert Time');
     return Promise.map(items, function(item) {
       total++;
       if (total % printEvery === 0) {
         console.log('Inserted ' + total + '/' + blocks);
+        console.timeEnd('Insert Time');
+        console.time('Insert Time');
       }
       return db.insert(item);
     }, {
