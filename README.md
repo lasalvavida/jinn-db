@@ -28,8 +28,41 @@ it won't choke when the dataset is larger than that, and it won't starve the
 rest of your application from memory as the database grows.
 
 ## Usage
+### Get Jinn
+```
+npm install jinn-db --save
+```
 
-TODO:
+### Open/Load a Database
+```javascript
+var Database = require('jinn-db');
+var db = new Database('wishes.db'); // If this file doesn't exist, it will be created
+db = new Database(); // If no fileName is provided, the database is created as a temporary file that will be deleted when the process exits.
+db.load()
+  .then(function(db) {
+    // Done loading!
+  });
+```
+
+For the examples below, our database is composed of the following entries:
+```javascript
+[{"_id":"0", "person": "ali", "wishNum": 0, "wishedFor": "gold"},
+ {"_id":"1", "person": "ali", "wishNum": 1, "wishedFor": "gold"},
+ {"_id":"2", "person": "ali", "wishNum": 2, "wishedFor": "more gold"}]
+```
+
+### Find entries
+```javascript
+// Find all of Ali's wishes
+db.find({person: 'ali'})
+  .then(function(results) {
+    /*
+     * results -> [{_id: '0', person: 'ali', wishNum: 0, wishedFor: 'gold'},
+     *             {_id: '1', person: 'ali', wishNum: 1, wishedFor: 'gold'},
+     *             {_id: '2', person: 'ali', wishNUm: 2, wishedFor: 'more gold'}]
+     */
+  });
+```
 
 Credit to @louischatriot and
 [NeDB](https://github.com/louischatriot/nedb)
