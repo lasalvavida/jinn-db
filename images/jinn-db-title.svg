@@ -30,8 +30,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="849.45852"
-     inkscape:cy="345.02833"
+     inkscape:cx="839.65209"
+     inkscape:cy="230.74262"
      inkscape:document-units="px"
      inkscape:current-layer="layer14"
      showgrid="false"
@@ -54,7 +54,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -81,7 +81,7 @@
      style="display:inline"
      transform="translate(1249.1267,-340.88566)">
     <path
-       style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1.0339092px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#333333;fill-rule:evenodd;stroke:#000000;stroke-width:1.0339092px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 319.36914,577.60638 c -9.23553,84.26101 -127.32995,65.77488 -160.18583,57.3312 23.52851,27.73605 120.31671,53.80163 223.67411,53.86021 110.95138,-0.0371 206.33084,-26.84822 221.81724,-57.12556 l 1.03907,0 0,-0.89258 c -19.71686,5.66643 -146.37556,32.41872 -160.19225,-53.11077 -20.3471,1.695 -41.44809,2.56182 -62.66406,2.57422 -21.50294,-0.0104 -42.88735,-0.89852 -63.48828,-2.63672 z"
        id="path3354-6"
        inkscape:connector-curvature="0"
@@ -94,7 +94,7 @@
      style="display:inline"
      transform="translate(1249.1267,-340.88566)">
     <path
-       style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1.0339092px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#333333;fill-rule:evenodd;stroke:#000000;stroke-width:1.0339092px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 99.216797,460.31836 C 64.767568,460.0733 40.40625,470.51367 40.40625,470.51367 l 2.019531,34.34571 c 105.055859,-30.3046 117.757809,83.02539 117.757809,83.02539 0.0747,14.33517 108.7199,54.11699 223.6836,54.14453 105.8311,-0.0354 211.35745,-31.09868 221.90625,-54.42578 18.66427,-13.02418 56.60875,-42.5714 73.04883,-77.69336 22.22336,-47.47717 -67.67969,-43.43555 -67.67969,-43.43555 l -4.04102,18.18164 -0.14062,1.27148 C 594.91456,503.24803 487.9553,533.15814 382.85742,533.19336 267.37238,533.16586 161.32278,500.45485 159.9043,485.1875 L 153.93947,468 c -21.31049,-8.83025 -36.84942,-7.5545 -54.722673,-7.68164 z m 537.357423,28.61133 c 4.98809,0.0115 10.68069,0.77852 16.99414,2.79883 25.25382,8.08122 -8.90793,49.03833 -40.22266,66.21093 l -0.35547,-62.29297 c 0,0 8.61971,-6.75126 23.58399,-6.71679 z"
        id="path3354-6-9-6"
        inkscape:connector-curvature="0"
@@ -107,7 +107,7 @@
      style="display:inline"
      transform="translate(1249.1267,-340.88566)">
     <path
-       style="display:inline;fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1.03507614px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="display:inline;fill:#333333;fill-rule:evenodd;stroke:#000000;stroke-width:1.03507614px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 160.05547,455.76274 c 0,20.8323 108.24752,57.57494 223.47187,57.60248 111.20254,-0.0372 223.24417,-36.66816 223.24417,-60.28029 l -122.29028,-56.97 c 0,0 13.36779,12.02726 -97.58358,12.06433 -114.9637,-0.0275 -104.20469,-11.89697 -104.20469,-11.89697 z"
        id="path3354-6-9-61"
        inkscape:connector-curvature="0"
@@ -120,7 +120,7 @@
      style="display:inline"
      transform="translate(1249.1267,-340.88566)">
     <ellipse
-       style="fill:#000000;fill-opacity:1"
+       style="fill:#333333;fill-opacity:1"
        id="path4396"
        cx="384.8681"
        cy="373.09155"
@@ -135,7 +135,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4151"
-       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:275px;line-height:125%;font-family:'TeX Gyre Chorus';-inkscape-font-specification:'TeX Gyre Chorus Medium';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:275px;line-height:125%;font-family:'TeX Gyre Chorus';-inkscape-font-specification:'TeX Gyre Chorus Medium';letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
        transform="matrix(1.2953289,0,0,1.2953289,-2155.0802,185.79972)"><flowRegion
          id="flowRegion4153"><rect
            id="rect4155"
@@ -143,7 +143,7 @@
            height="595.98999"
            x="699.02557"
            y="7.513061"
-           style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:275px;font-family:'TeX Gyre Chorus';-inkscape-font-specification:'TeX Gyre Chorus Medium'" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:275px;font-family:'TeX Gyre Chorus';-inkscape-font-specification:'TeX Gyre Chorus Medium';fill:#333333;" /></flowRegion><flowPara
          id="flowPara4157"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:375px;font-family:'TeX Gyre Chorus';-inkscape-font-specification:'TeX Gyre Chorus Medium'">JinnDb</flowPara></flowRoot>  </g>
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:375px;font-family:'TeX Gyre Chorus';-inkscape-font-specification:'TeX Gyre Chorus Medium';fill:#333333;">JinnDb</flowPara></flowRoot>  </g>
 </svg>
