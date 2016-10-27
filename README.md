@@ -1,6 +1,6 @@
 ![jinn-db](images/jinn-db-title.png)
 
-A pure javascript, persistent key-value store for Node.js that supports out-of-core data access.
+### JinnDb is a persistent key-value store for Node.js that supports out-of-core data access with no native dependencies.
 
 ## About
 ### What can Jinn do for me?
@@ -65,8 +65,10 @@ db.find({person: 'ali'})
   });
 ```
 
-Credit to @louischatriot and
-[NeDB](https://github.com/louischatriot/nedb)
+Credit to @louischatriot for
+[NeDB](https://github.com/louischatriot/nedb),
+and by proxy
+[MongoDB](https://www.mongodb.com/),
 off of which this API is largely based.
 
 ## Benchmarks
