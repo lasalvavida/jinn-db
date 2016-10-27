@@ -1,3 +1,5 @@
+![jinn-db](images/jinn-db-title.png)
+
 # JinnDB
 A pure javascript, persistent key-value store for Node.js that supports out-of-core data access.
 
