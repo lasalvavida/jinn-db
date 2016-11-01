@@ -210,6 +210,79 @@ describe('Database', function() {
         });
     });
 
+    it('finds the first match in the database', function(done) {
+      var database = new Database(fruitDb);
+      database.load()
+        .then(function() {
+          return database.find({color: 'red'}, {limit: 1})
+            .then(function(results) {
+              expect(results.length).toBe(1);
+              expect(results[0].name).toBe('apple');
+              done();
+            });
+        });
+    });
+
+    it('finds the first match with a sort', function(done) {
+      var database = new Database(fruitDb);
+      database.load()
+        .then(function() {
+          return database.find({color: 'red'}, {
+            limit: 1,
+            sort: function(a, b) {
+              return a.name < b.name;
+            }
+          }).then(function(results) {
+              expect(results.length).toBe(1);
+              expect(results[0].name).toBe('strawberries');
+              done();
+            });
+        });
+    });
+
+    it('finds with a projection', function(done) {
+      var database = new Database(fruitDb);
+      database.load()
+        .then(function() {
+          return database.find({color: 'red'}, {
+            projections: {
+              name: true
+            }
+          }).then(function(results) {
+            expect(results.length).toBe(2);
+            expect(results[0].name).toBe('apple');
+            expect(results[0]._id).toBeDefined();
+            expect(results[0].color).not.toBeDefined();
+            expect(results[1].name).toBe('strawberries');
+            expect(results[1]._id).toBeDefined();
+            expect(results[1].color).not.toBeDefined();
+            done();
+          });
+        });
+    });
+
+    it('finds with a projection, ommitting _id', function(done) {
+      var database = new Database(fruitDb);
+      database.load()
+        .then(function() {
+          return database.find({color: 'red'}, {
+            projections: {
+              _id: false,
+              name: true
+            }
+          }).then(function(results) {
+            expect(results.length).toBe(2);
+            expect(results[0].name).toBe('apple');
+            expect(results[0]._id).not.toBeDefined();
+            expect(results[0].color).not.toBeDefined();
+            expect(results[1].name).toBe('strawberries');
+            expect(results[1]._id).not.toBeDefined();
+            expect(results[1].color).not.toBeDefined();
+            done();
+          });
+        });
+    });
+
     describe('supports built-in operator functions', function() {
       it('$lt', function(done) {
         db.find({_id: {$lt: 3}})
@@ -306,20 +379,40 @@ describe('Database', function() {
             done();
           });
       });
-    });
-  });
 
-  describe('findOne', function() {
-    it('finds the first match in the database', function(done) {
-      var database = new Database(fruitDb);
-      database.load()
-        .then(function() {
-          return database.findOne({color: 'red'})
-            .then(function(result) {
-              expect(result.name).toBe('apple');
-              done();
-            });
+      it('$or', function(done) {
+        db.find({$or: [{color: 'red'}, {color: 'yellow'}]})
+          .then(function(results) {
+            expect(results.length).toBe(4);
+            expect(results[0].name).toBe('apple');
+            expect(results[1].name).toBe('banana');
+            expect(results[2].name).toBe('pineapple');
+            expect(results[3].name).toBe('strawberries');
+            done();
+          });
+      });
+
+      it('$and', function(done) {
+        db.find({$and: [{color: 'red'}, {color: 'yellow'}]})
+          .then(function(results) {
+            expect(results.length).toBe(0);
+            done();
+          });
+      });
+
+      it('$not', function(done) {
+        db.find({$not: {$or: [
+          {color: 'red'},
+          {color: 'yellow'},
+          {color: 'orange'},
+          {color: 'green'}
+        ]}}).then(function(results) {
+          expect(results.length).toBe(2);
+          expect(results[0].name).toBe('coconut');
+          expect(results[1].name).toBe('grape');
+          done();
         });
+      });
     });
   });
 
@@ -415,7 +508,7 @@ describe('Database', function() {
     });
   });
 
-  describe('delete', function() {
+  describe('remove', function() {
     it('removes an item from a database', function(done) {
       var db;
       fsCopy(fruitDb, fruitDbTemp)
@@ -424,7 +517,7 @@ describe('Database', function() {
         })
         .then(function(database) {
           db = database;
-          return db.delete({name: 'grape'});
+          return db.remove({name: 'grape'});
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(1);
@@ -449,7 +542,7 @@ describe('Database', function() {
         })
         .then(function(database) {
           db = database;
-          return db.delete({color: 'red'});
+          return db.remove({color: 'red'});
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(2);
@@ -473,10 +566,10 @@ describe('Database', function() {
           return db.load();
         })
         .then(function() {
-          return db.delete([
+          return db.remove({$or: [
             {name: 'strawberries'},
             {name: 'coconut'}
-          ]);
+          ]});
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(2);
@@ -486,6 +579,35 @@ describe('Database', function() {
         .then(function(results) {
           expect(results.length).toBe(1);
           expect(results[0].color).toBe('purple');
+          return fsRemove(tmpDir);
+        })
+        .then(function() {
+          done();
+        });
+    });
+
+    it('removes a sorted and limited set of queries', function(done) {
+      var db;
+      fsCopy(fruitDb, fruitDbTemp)
+        .then(function() {
+          db = new Database(fruitDbTemp);
+          return db.load();
+        })
+        .then(function() {
+          return db.remove({color: 'red'}, {
+            limit: 1,
+            sort: function(a, b) {
+              return a.name < b.name;
+            }
+          });
+        })
+        .then(function(numRemoved) {
+          expect(numRemoved).toBe(1);
+          expect(db.cache.length).toBe(7);
+          return db.find({name: 'strawberries'});
+        })
+        .then(function(results) {
+          expect(results.length).toBe(0);
           return fsRemove(tmpDir);
         })
         .then(function() {
@@ -584,9 +706,11 @@ describe('Database', function() {
         })
         .then(function(results) {
           expect(results.length).toBe(2);
-          return db.findOne({name: 'blackberry'})
+          return db.find({name: 'blackberry'})
         })
-        .then(function(item) {
+        .then(function(results) {
+          expect(results.length).toBe(1);
+          var item = results[0];
           expect(item).toBeDefined();
           expect(item.color).toBe('black');
           return fsRemove(tmpDir);
