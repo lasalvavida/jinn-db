@@ -1,14 +1,9 @@
 'use strict';
 var Database = require('../../lib/Database');
-var Promise = require('bluebird');
-var fs = require('fs-extra');
 
-var bigDataTemp = 'specs/data/.tmp/big.db';
 var fruitDb = 'specs/data/fruit.db';
-var fruitDbTemp = 'specs/data/.tmp/fruit.db';
 var helloWorldDb = 'specs/data/helloWorld.db';
 var mismatchedBlockSizesDb = 'specs/data/mismatchedBlockSizes.db';
-var tmpDir = 'specs/data/.tmp';
 
 var expectFruits = [
   'apple',
