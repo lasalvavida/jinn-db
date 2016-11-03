@@ -3,9 +3,6 @@ var Database = require('../../lib/Database');
 var Promise = require('bluebird');
 var fs = require('fs-extra');
 
-var fsCopy = Promise.promisify(fs.copy);
-var fsRemove = Promise.promisify(fs.remove);
-
 var bigDataTemp = 'specs/data/.tmp/big.db';
 var fruitDb = 'specs/data/fruit.db';
 var fruitDbTemp = 'specs/data/.tmp/fruit.db';
@@ -41,6 +38,22 @@ describe('Database', function() {
           expect(world.cached).toBe(true);
           cacheIndex = world.cacheIndex;
           expect(database.cache[cacheIndex].data).toBe("World");
+          done();
+        });
+    });
+
+    it('creates a database that is a copy of another', function(done) {
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
+        .then(function() {
+          return database.find({color: 'red'})
+        })
+        .then(function(results) {
+          expect(results.length).toBe(2);
+          expect(results[0].name).toBe('apple');
+          expect(results[1].name).toBe('strawberries');
           done();
         });
     });
@@ -419,15 +432,16 @@ describe('Database', function() {
   describe('resize', function() {
     it('can change disk block size of in-memory database', function(done) {
       var fruits = [];
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
-          return new Database(fruitDbTemp).load();
-        })
-        .then(function(database) {
           return database.resize(64);
         })
         .then(function() {
-          return new Database(fruitDbTemp).load();
+          database = new Database(database.fileName);
+          return database.load();
         })
         .then(function(database) {
           expect(database.blockSize).toBe(64);
@@ -438,26 +452,22 @@ describe('Database', function() {
         })
         .then(function() {
           expect(fruits).toEqual(expectFruits);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
 
     it('can increase block size of a partially on-disk database', function(done) {
       var fruits = [];
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.maxCacheSize = 200;
+      database.load()
         .then(function() {
-          var database = new Database(fruitDbTemp);
-          database.maxCacheSize = 200;
-          return database.load();
-        })
-        .then(function(database) {
           return database.resize(64);
         })
         .then(function() {
-          var database = new Database(fruitDbTemp);
+          database = new Database(database.fileName);
           return database.load();
         })
         .then(function(database) {
@@ -469,26 +479,22 @@ describe('Database', function() {
         })
         .then(function() {
           expect(fruits).toEqual(expectFruits);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
 
     it('can decrease block size of a partially on-disk database', function(done) {
       var fruits = [];
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.maxCacheSize = 200;
+      database.load()
         .then(function() {
-          var database = new Database(fruitDbTemp);
-          database.maxCacheSize = 200;
-          return database.load();
-        })
-        .then(function(database) {
           return database.resize(48);
         })
         .then(function() {
-          var database = new Database(fruitDbTemp);
+          database = new Database(database.fileName);
           return database.load();
         })
         .then(function(database) {
@@ -500,9 +506,6 @@ describe('Database', function() {
         })
         .then(function() {
           expect(fruits).toEqual(expectFruits);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
@@ -510,91 +513,74 @@ describe('Database', function() {
 
   describe('remove', function() {
     it('removes an item from a database', function(done) {
-      var db;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
-          return new Database(fruitDbTemp).load();
-        })
-        .then(function(database) {
-          db = database;
-          return db.remove({name: 'grape'});
+          return database.remove({name: 'grape'});
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(1);
-          var cache = db.cache;
+          var cache = database.cache;
           expect(cache.length).toBe(7);
-          return db.find({name: 'grape'});
+          return database.find({name: 'grape'});
         })
         .then(function(results) {
           expect(results.length).toBe(0);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
 
     it('removes multiple items from a database', function(done) {
-      var db;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
-          return new Database(fruitDbTemp).load();
-        })
-        .then(function(database) {
-          db = database;
-          return db.remove({color: 'red'});
+          return database.remove({color: 'red'});
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(2);
-          return db.find({color: 'red'});
+          return database.find({color: 'red'});
         })
         .then(function(results) {
           expect(results.length).toBe(0);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
 
     it('removes an array of queries, cached and on-disk', function(done) {
-      var db;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.maxCacheSize = 200;
+      database.load()
         .then(function() {
-          db = new Database(fruitDbTemp);
-          db.maxCacheSize = 200;
-          return db.load();
-        })
-        .then(function() {
-          return db.remove({$or: [
+          return database.remove({$or: [
             {name: 'strawberries'},
             {name: 'coconut'}
           ]});
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(2);
-          expect(db.cache.length).toBe(4);
-          return db.find({name: 'grape'});
+          expect(database.cache.length).toBe(4);
+          return database.find({name: 'grape'});
         })
         .then(function(results) {
           expect(results.length).toBe(1);
           expect(results[0].color).toBe('purple');
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
 
     it('removes a sorted and limited set of queries', function(done) {
-      var db;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
-          db = new Database(fruitDbTemp);
-          return db.load();
-        })
-        .then(function() {
-          return db.remove({color: 'red'}, {
+          return database.remove({color: 'red'}, {
             limit: 1,
             sort: function(a, b) {
               return a.name < b.name;
@@ -603,14 +589,11 @@ describe('Database', function() {
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(1);
-          expect(db.cache.length).toBe(7);
-          return db.find({name: 'strawberries'});
+          expect(database.cache.length).toBe(7);
+          return database.find({name: 'strawberries'});
         })
         .then(function(results) {
           expect(results.length).toBe(0);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
@@ -618,104 +601,108 @@ describe('Database', function() {
 
   describe('insert', function() {
     it('adds a new item to the database', function(done) {
-      var db;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
-          db = new Database(fruitDbTemp);
-          return db.load();
+          return database.insert({_id:"8", color:'green', name:'honeydew'});
         })
         .then(function() {
-          return db.insert({_id:"8", color:'green', name:'honeydew'});
-        })
-        .then(function() {
-          return db.find({color:'green'});
+          return database.find({color:'green'});
         })
         .then(function(results) {
           expect(results.length).toBe(2);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
 
     it('adds a new item to the database, resizing it', function(done) {
-      var db;
       var blockSize;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.maxCacheSize = 200;
+      database.load()
         .then(function() {
-          db = new Database(fruitDbTemp);
-          db.maxCacheSize = 200;
-          return db.load();
+          blockSize = database.blockSize;
+          return database.insert({color:'green', name:'honeydew'});
         })
         .then(function() {
-          blockSize = db.blockSize;
-          return db.insert({color:'green', name:'honeydew'});
-        })
-        .then(function() {
-          return db.find({color:'green'});
+          return database.find({color:'green'});
         })
         .then(function(results) {
           expect(results.length).toBe(2);
-          expect(db.blockSize).not.toBe(blockSize);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
+          expect(database.blockSize).not.toBe(blockSize);
           done();
         });
     });
 
     it('overwrites an existing item in the database', function(done) {
-      var db;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
-          db = new Database(fruitDbTemp);
-          return db.load();
+          return database.insert({_id:'5', color:'green', name:'honeydew'});
         })
         .then(function() {
-          return db.insert({_id:'5', color:'green', name:'honeydew'});
-        })
-        .then(function() {
-          return db.find({color:'green'});
+          return database.find({color:'green'});
         })
         .then(function(results) {
           expect(results.length).toBe(1);
-          return fsRemove(tmpDir);
-        })
-        .then(function() {
           done();
         });
     });
 
     it('adds multiple items to the database', function(done) {
-      var db;
-      fsCopy(fruitDb, fruitDbTemp)
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
-          db = new Database(fruitDbTemp);
-          return db.load();
-        })
-        .then(function() {
-          return db.insert([
+          return database.insert([
             {_id:"8", color:'green', name:'honeydew'},
             {color:'orange', name:'cantalope'},
             {_id:"0", color:'black', name:'blackberry'}
           ]);
         })
         .then(function() {
-          return db.find({color:'green'});
+          return database.find({color:'green'});
         })
         .then(function(results) {
           expect(results.length).toBe(2);
-          return db.find({name: 'blackberry'})
+          return database.find({name: 'blackberry'})
         })
         .then(function(results) {
           expect(results.length).toBe(1);
           var item = results[0];
           expect(item).toBeDefined();
           expect(item.color).toBe('black');
-          return fsRemove(tmpDir);
-        })
+          done();
+        });
+    });
+  });
+
+  describe('update', function() {
+    it('updates an existing entry', function() {
+      var database = new Database({
+        copyOf: fruitDb
+      });
+      database.load()
         .then(function() {
+          return database.update({color: 'red'}, {color: 'maroon'});
+        })
+        .then(function(numUpdated) {
+          expect(numUpdated).toBe(2);
+          return database.find({color:'maroon'});
+        })
+        .then(function(results) {
+          expect(results.length).toBe(2);
+          expect(results[0].name).toBe('apple');
+          expect(results[0].color).toBe('maroon');
+          expect(results[1].name).toBe('strawberries');
+          expect(results[1].color).toBe('maroon');
           done();
         });
     });
