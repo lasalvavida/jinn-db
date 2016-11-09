@@ -12,7 +12,7 @@
     "url": "git+https://github.com/lasalvavida/pandora-db.git"
   },
   "keywords": [
-    "pandora",
+    "jinn",
     "db",
     "database",
     "key",
@@ -34,6 +34,7 @@
     "defaults": "1.0.3",
     "fs-extra": "0.30.0",
     "node-uuid": "1.4.7",
+    "smaz": "^1.0.0",
     "tmp": "0.0.29"
   },
   "devDependencies": {

@@ -3,7 +3,6 @@ var Database = require('../../lib/Database');
 
 var fruitDb = 'specs/data/fruit.db';
 var helloWorldDb = 'specs/data/helloWorld.db';
-var mismatchedBlockSizesDb = 'specs/data/mismatchedBlockSizes.db';
 
 var expectFruits = [
   'apple',
@@ -53,21 +52,12 @@ describe('Database', function() {
         });
     });
 
-    it('throws when loading a database with mismatched block sizes', function(done) {
-      var database = new Database(mismatchedBlockSizesDb);
-      database.load()
-        .catch(function(err) {
-          expect(err).toBeDefined();
-          done();
-        });
-    });
-
     it('blocks are loaded into memory until the cache is full', function(done) {
       var database = new Database(fruitDb);
       database.maxCacheSize = 200;
       database.load()
         .then(function() {
-          expect(database.cache.length).toBe(4);
+          expect(database.cache.length).toBe(3);
           expect(database.blocks).toBe(8);
           done();
         });
@@ -119,7 +109,7 @@ describe('Database', function() {
       database.maxCacheSize = 200;
       database.load()
         .then(function() {
-          expect(database.cache.length).toBe(4);
+          expect(database.cache.length).toBe(3);
           expect(database.blocks).toBe(8);
           return database.iterate(function(item) {
             fruits[parseInt(item._id)] = item.name;
@@ -438,7 +428,7 @@ describe('Database', function() {
           database = new Database(database.fileName);
           return database.load();
         })
-        .then(function(database) {
+        .then(function() {
           expect(database.blockSize).toBe(64);
           return database.iterate(function(item) {
             fruits[parseInt(item._id)] = item.name;
@@ -462,10 +452,13 @@ describe('Database', function() {
           return database.resize(64);
         })
         .then(function() {
+          return database.close();
+        })
+        .then(function() {
           database = new Database(database.fileName);
           return database.load();
         })
-        .then(function(database) {
+        .then(function() {
           expect(database.blockSize).toBe(64);
           return database.iterate(function(item) {
             fruits[parseInt(item._id)] = item.name;
@@ -489,10 +482,13 @@ describe('Database', function() {
           return database.resize(48);
         })
         .then(function() {
+          return database.close();
+        })
+        .then(function() {
           database = new Database(database.fileName);
           return database.load();
         })
-        .then(function(database) {
+        .then(function() {
           expect(database.blockSize).toBe(48);
           return database.iterate(function(item) {
             fruits[parseInt(item._id)] = item.name;
@@ -559,7 +555,7 @@ describe('Database', function() {
         })
         .then(function(numRemoved) {
           expect(numRemoved).toBe(2);
-          expect(database.cache.length).toBe(4);
+          expect(database.cache.length).toBe(3);
           return database.find({name: 'grape'});
         })
         .then(function(results) {
@@ -680,7 +676,7 @@ describe('Database', function() {
   });
 
   describe('update', function() {
-    it('updates an existing entry', function() {
+    it('updates a existing entries', function() {
       var database = new Database({
         copyOf: fruitDb
       });
@@ -700,6 +696,84 @@ describe('Database', function() {
           expect(results[1].color).toBe('maroon');
           done();
         });
+    });
+
+    describe('supports built-in operator functions', function() {
+      it('$set', function() {
+        var database = new Database({
+          copyOf: fruitDb
+        });
+        database.load()
+          .then(function() {
+            return database.update({color: 'red'}, {$set: {isRed: true, isNotRed: false}});
+          })
+          .then(function() {
+            return database.find({isRed: true})
+          })
+          .then(function(results) {
+            expect(results.length).toBe(2);
+            expect(results[0].isNotRed).toBe(false);
+            expect(results[1].isNotRed).toBe(false);
+          });
+      });
+
+      it('$unset', function() {
+        var database = new Database({
+          copyOf: fruitDb
+        });
+        database.load()
+          .then(function() {
+            return database.update({color: 'orange'}, {$unset: {name: true}})
+          })
+          .then(function() {
+            return database.find({color: 'orange'})
+          })
+          .then(function(results) {
+            expect(results.length).toBe(1);
+            expect(results[0].name).not.toBeDefined();
+          })
+      });
+
+      it('$inc', function() {
+        var database = new Database({
+          copyOf: fruitDb
+        });
+        database.load()
+          .then(function() {
+            return database.insert({name: 'counter', value: '1'});
+          })
+          .then(function() {
+            return database.update({name: 'counter'}, {$inc: {value: -1}});
+          })
+          .then(function() {
+            return database.find({name: 'counter'});
+          })
+          .then(function(results) {
+            expect(results.length).toBe(1);
+            expect(results[0].value).toBe(0);
+          })
+      });
+
+      it('$min', function() {
+        var database = new Database({
+          copyOf: fruitDb
+        });
+        database.load()
+          .then(function() {
+            return database.insert({name: 'minTest', value: 2}, {name: 'minTest', value: 5});
+          })
+          .then(function() {
+            return database.update({name: 'minTest'}, {$min: {value: 3}});
+          })
+          .then(function() {
+            return database.find({name: 'minTest'})
+          })
+          .then(function(results) {
+            expect(results.length).toBe(2);
+            expect(results[0].value).toBe(2);
+            expect(results[1].value).toBe(3);
+          });
+      });
     });
   });
 });
