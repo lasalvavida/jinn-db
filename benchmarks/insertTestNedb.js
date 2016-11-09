@@ -2,19 +2,22 @@
 'use strict';
 var Datastore = require('nedb');
 var Promise = require('bluebird');
+var fs = require('fs-extra');
+var json2csv = require('json2csv');
 var tmp = require('tmp');
 
-var tmpName = Promise.promisify(tmp.tmpName);
 Datastore.prototype.loadDatabaseAsync = Promise.promisify(Datastore.prototype.loadDatabase);
 Datastore.prototype.insertAsync = Promise.promisify(Datastore.prototype.insert);
+var fsOutputFile = Promise.promisify(fs.outputFile);
+var tmpName = Promise.promisify(tmp.tmpName);
 
+var data = [];
+var startTime = Date.now();
+
+var blocks = 100000;
 var db;
-var fileName;
-var blocks = 5600000;
-var printEvery = 10000;
 tmpName()
   .then(function(path) {
-    fileName = path;
     db = new Datastore({filename: path});
     return db.loadDatabaseAsync();
   })
@@ -24,25 +27,27 @@ tmpName()
       items.push({});
     }
     var total = 0;
-    console.time('Total Insert Time');
     return Promise.map(items, function(item) {
+      var memoryUsage = process.memoryUsage();
+      data.push({
+        item: total,
+        time: Date.now() - startTime,
+        memTotal: memoryUsage.heapTotal,
+        memUsed: memoryUsage.heapUsed
+      });
       total++;
-      if (total % printEvery === 0) {
-        console.log('Inserted ' + total + '/' + blocks);
-      }
       return db.insertAsync(item);
     }, {
       concurrency: 1
     });
   })
   .then(function() {
-    console.timeEnd('Total Insert Time');
-    var db = new Datastore({filename: fileName});
-    return db.loadDatabaseAsync();
-  })
-  .then(function() {
-    console.log('Test completed successfully');
+    var csv = json2csv({
+      data: data,
+      fields: ['item', 'time', 'memTotal', 'memUsed']
+    });
+    return fs.writeFile('results/insertTestNedb.csv', csv);
   })
   .catch(function(err) {
-    console.log('Test failed with error: ' + err);
+    console.error('Test failed with error: ' + err)
   });
