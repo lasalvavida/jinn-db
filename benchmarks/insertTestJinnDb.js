@@ -10,7 +10,9 @@ var fsOutputFile = Promise.promisify(fs.outputFile);
 var data = [];
 var startTime = Date.now();
 
-var db = new Database();
+var db = new Database({
+  compressed: false
+});
 var blocks = 100000;
 
 db.load()
@@ -38,7 +40,7 @@ db.load()
     db.close();
     var csv = json2csv({
       data: data,
-      fields: ['item', 'time', 'memUsed']
+      fields: ['item', 'time', 'memTotal', 'memUsed']
     });
     return fsOutputFile('results/insertTestJinnDb.csv', csv);
   })

@@ -15,7 +15,7 @@ function randomBetween(a, b) {
 var operations = [
   'insert',
   'find',
-  /*'update',*/
+  'update',
   'remove'
 ];
 var groups = 'abcdefghijklmnopqrstuvwxyz';
@@ -45,7 +45,7 @@ db.load()
       items.push(element);
     }
     var total = 0;
-    return Promise.map(items, function(item) {
+    return Promise.map(items, function(element) {
       var memoryUsage = process.memoryUsage();
       data.push({
         item: total,
@@ -54,7 +54,7 @@ db.load()
         memUsed: memoryUsage.heapUsed
       });
       total++;
-      return db[item.operation](item.item);
+      return db[element.operation](element.item, element.update);
     }, {
       concurrency: 1
     });

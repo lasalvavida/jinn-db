@@ -11,6 +11,7 @@ Datastore.prototype.loadDatabaseAsync = Promise.promisify(Datastore.prototype.lo
 Datastore.prototype.insertAsync = Promise.promisify(Datastore.prototype.insert);
 Datastore.prototype.findAsync = Promise.promisify(Datastore.prototype.find);
 Datastore.prototype.removeAsync = Promise.promisify(Datastore.prototype.remove);
+Datastore.prototype.updateAsync = Promise.promisify(Datastore.prototype.update);
 var fsOutputFile = Promise.promisify(fs.outputFile);
 var tmpName = Promise.promisify(tmp.tmpName);
 
@@ -21,7 +22,7 @@ function randomBetween(a, b) {
 var operations = [
   'insert',
   'find',
-  /*'update',*/
+  'update',
   'remove'
 ];
 var groups = 'abcdefghijklmnopqrstuvwxyz';
@@ -54,7 +55,7 @@ tmpName()
       items.push(element);
     }
     var total = 0;
-    return Promise.map(items, function(item) {
+    return Promise.map(items, function(element) {
       var memoryUsage = process.memoryUsage();
       data.push({
         item: total,
@@ -63,7 +64,11 @@ tmpName()
         memUsed: memoryUsage.heapUsed
       });
       total++;
-      return db[item.operation + 'Async'](item.item);
+      if (element.update) {
+        return db[element.operation + 'Async'](element.item, element.update);
+      } else {
+        return db[element.operation + 'Async'](element.item);
+      }
     }, {
       concurrency: 1
     });
