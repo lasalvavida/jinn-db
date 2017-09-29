@@ -1,6 +1,6 @@
 {
   "name": "jinn-db",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A pure javascript, persisten key-value store for Node.js that supports out-of-core data access.",
   "main": "index.js",
   "scripts": {
@@ -32,14 +32,17 @@
     "clone": "2.0.0",
     "deep-equal": "1.0.1",
     "defaults": "1.0.3",
-    "fs-extra": "0.30.0",
-    "node-uuid": "1.4.7",
-    "smaz": "1.0.0",
-    "tmp": "0.0.29"
+    "fs-extra": "^0.30.0",
+    "sihr": "^1.0.5",
+    "tmp": "0.0.29",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "jasmine": "2.5.2",
     "jshint": "2.9.4",
-    "nedb": "1.8.0"
+    "json2csv": "^3.8.0",
+    "nedb": "1.8.0",
+    "tingodb": "^0.5.1",
+    "yargs": "^8.0.2"
   }
 }
