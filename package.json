@@ -1,6 +1,6 @@
 {
   "name": "jinn-db",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A pure javascript, persisten key-value store for Node.js that supports out-of-core data access.",
   "main": "index.js",
   "scripts": {
